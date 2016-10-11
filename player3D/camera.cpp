@@ -30,7 +30,7 @@ void Camera::save_camera()
     stemp<<ImgCount;
     string scount = stemp.str();
 
-    string str="E:\\work\\Github\\QT\QtDemo\\pic\\left";
+    string str="E:\\work\\Github\\QT\\QtDemo\\pic\\left\\";
     str += scount;
     str += ".jpg";
 
@@ -38,7 +38,7 @@ void Camera::save_camera()
     stempr<<ImgCount;
     string scountr = stempr.str();
 
-    string strr="E:\\work\\Github\\QT\QtDemo\\pic\\right";
+    string strr="E:\\work\\Github\\QT\\QtDemo\\pic\\right\\";
     strr += scountr;
     strr += ".jpg";
 

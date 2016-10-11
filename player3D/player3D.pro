@@ -16,7 +16,7 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         player3d.cpp \
-    camera.cpp
+        camera.cpp
 
 INCLUDEPATH += E:\work\Library\OpenCV\OpenCV2.4.11\opencv\build\include \
                E:\work\Library\OpenCV\OpenCV2.4.11\opencv\build\include\opencv \
