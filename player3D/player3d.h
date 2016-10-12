@@ -30,8 +30,15 @@ private:
 
     QTimer theTimer;
     bool swapFlag;
-    int crop_left;
-    int crop_right;
+
+    int image_left_crop_up;
+    int image_left_crop_down;
+    int image_left_crop_left;
+    int image_left_crop_right;
+    int image_right_crop_up;
+    int image_right_crop_down;
+    int image_right_crop_left;
+    int image_right_crop_right;
 
 protected:
     void paintEvent(QPaintEvent *e);
