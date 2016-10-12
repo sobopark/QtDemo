@@ -5,7 +5,7 @@
 #include <QtWidgets>
 #include <QKeyEvent>
 
-// test github push
+// version_1_4 : 2016_10_12_15_26
 
 using namespace cv;
 using namespace std;
@@ -25,6 +25,7 @@ player3D::player3D(QWidget *parent) :
     statusBar()->hide();
 
     swapFlag = false;
+    recordFlag = false;
 
     image_left_crop_up = 0;
     image_left_crop_down = 0;
@@ -35,6 +36,8 @@ player3D::player3D(QWidget *parent) :
     image_right_crop_left = 0;
     image_right_crop_right = 0;
 
+    record_path = "";
+    record_image_count = 0;
 
     connect(&theTimer, &QTimer::timeout, this, &player3D::updateImage);
 //    connect(ui->open_camera, SIGNAL(clicked(bool)), this, SLOT(open_camera()));
@@ -104,25 +107,34 @@ void player3D::paintEvent(QPaintEvent *e)
 
     imagel = imagel.copy(QRect(image_left_crop_left,
                                image_left_crop_up,
-                               image1_size.width() - image_left_crop_left,
+                               image1_size.width() - image_left_crop_left - image_left_crop_right,
                                image1_size.height() - image_left_crop_up - image_left_crop_down));
-    imagel = imagel.scaled(QSize(image1_size.width(),image1_size.height()),Qt::KeepAspectRatioByExpanding);
-    imager = imager.copy(QRect(0,
+    imagel = imagel.scaled(QSize(image1_size.width(),image1_size.height()),Qt::IgnoreAspectRatio);
+    imager = imager.copy(QRect(image_right_crop_left,
                                image_right_crop_up,
-                               imager_size.width() - image_right_crop_right,
+                               imager_size.width() - image_right_crop_left - image_right_crop_right,
                                imager_size.height() - image_right_crop_up - image_right_crop_down));
-    imager = imager.scaled(QSize(imager_size.width(),imager_size.height()),Qt::KeepAspectRatioByExpanding);
+    imager = imager.scaled(QSize(imager_size.width(),imager_size.height()),Qt::IgnoreAspectRatio);
 
     QImage image_result = QImage(result_size_width,result_size_height,QImage::Format_RGB888);
     QPainter painter(&image_result);
     painter.drawImage(0,0,imagel);
     painter.drawImage(image1_size.width(),0,imager);
     painter.end();
+
+
+    if(recordFlag){
+
+        QString s = QString("%1").arg(record_image_count, 4, 10, QChar('0'));
+        QString record_image_path = record_path + "\\" + s + ".png";
+        image_result.save(record_image_path);
+        record_image_count++;
+
+    }
+
     QImage image_result_resize = image_result.scaled(QSize(ui->img_label->width(),ui->img_label->height()));
-
     ui->img_label->setPixmap(QPixmap::fromImage(image_result_resize));
-    ui->img_label->resize(image_result_resize.size());
-
+//    ui->img_label->resize(image_result_resize.size());
     ui->img_label->show();
 }
 
@@ -130,9 +142,13 @@ void player3D::open_camera()
 {
     if(cam->videoCapL.open(0))
     {
+        cam->videoCapL.set(CV_CAP_PROP_FRAME_WIDTH,1080);
+        cam->videoCapL.set(CV_CAP_PROP_FRAME_HEIGHT,960);
         cam->srcImageL = Mat::zeros(cam->videoCapL.get(CV_CAP_PROP_FRAME_HEIGHT), cam->videoCapL.get(CV_CAP_PROP_FRAME_WIDTH), CV_8UC3);
         if(cam->videoCapR.open(1))
         {
+            cam->videoCapR.set(CV_CAP_PROP_FRAME_WIDTH,1080);
+            cam->videoCapR.set(CV_CAP_PROP_FRAME_HEIGHT,960);
             cam->srcImageR = Mat::zeros(cam->videoCapR.get(CV_CAP_PROP_FRAME_HEIGHT), cam->videoCapR.get(CV_CAP_PROP_FRAME_WIDTH), CV_8UC3);
             theTimer.start(33);
         }
@@ -144,16 +160,34 @@ void player3D::close_camera()
     theTimer.stop();
 }
 
+void player3D::record()
+{
+    QFileDialog::Options options = QFileDialog::DontResolveSymlinks | QFileDialog::ShowDirsOnly;
+                         options |= QFileDialog::DontUseNativeDialog;
+    record_path = QFileDialog::getExistingDirectory(this,
+                                    tr("Open Directory"),
+                                    ".",
+                                    options);
+    if (!record_path.isEmpty()){
+        recordFlag = true;
+        record_image_count = 1;
+    }
+}
+
+
 void player3D::contextMenuEvent(QContextMenuEvent *e)
 {
     QCursor cursor = this->cursor();
     QMenu *menu = new QMenu(this);
     QAction *deleteAction = new QAction(tr("close"),this);
     QAction *cameraAction = new QAction(tr("camera"),this);
+    QAction *recordAction = new QAction(tr("record"),this);
     menu->addAction(deleteAction);
     menu->addAction(cameraAction);
-    connect(deleteAction,SIGNAL(triggered()),SLOT(close()));
+    menu->addAction(recordAction);
+    connect(deleteAction,SIGNAL(triggered()),qApp,SLOT(quit()));
     connect(cameraAction,SIGNAL(triggered()),SLOT(open_camera()));
+    connect(recordAction,SIGNAL(triggered()),SLOT(record()));
     menu->exec(cursor.pos());
 }
 
@@ -167,22 +201,56 @@ void player3D::keyPressEvent(QKeyEvent *e)
         }else{
             image_left_crop_left++;
         }
+        break;
     case Qt::Key_W:
-        image_left_crop_up++;
+        if(e->modifiers() == Qt::ControlModifier){
+            image_left_crop_up--;
+            image_left_crop_up = image_left_crop_up > 0 ? image_left_crop_up : 0;
+        }else{
+            image_left_crop_up++;
+        }
         break;
     case Qt::Key_S:
-        if(e->modifiers() == Qt::ControlModifier)
-        {
-
+        if(e->modifiers() == Qt::ControlModifier){
+            image_left_crop_down--;
+            image_left_crop_down = image_left_crop_down > 0 ? image_left_crop_down : 0;
+        }else{
+            image_left_crop_down++;
         }
-        image_left_crop_down++;
-        break;
-    case Qt::Key_E:
-        image_right_crop_up++;
         break;
     case Qt::Key_D:
-        image_right_crop_down++;
-    case Qt::Key_F:
+        if(e->modifiers() == Qt::ControlModifier){
+            image_left_crop_right--;
+            image_left_crop_right = image_left_crop_right > 0 ? image_left_crop_right : 0;
+        }else{
+            image_left_crop_right++;
+        }
+        break;
+    case Qt::Key_H:
+        if(e->modifiers() == Qt::ControlModifier){
+            image_right_crop_left--;
+            image_right_crop_left = image_right_crop_left > 0 ? image_right_crop_left : 0;
+        }else{
+            image_right_crop_left++;
+        }
+        break;
+    case Qt::Key_U:
+        if(e->modifiers() == Qt::ControlModifier){
+            image_right_crop_up--;
+            image_right_crop_up = image_right_crop_up > 0 ? image_right_crop_up : 0;
+        }else{
+            image_right_crop_up++;
+        }
+        break;
+    case Qt::Key_J:
+        if(e->modifiers() == Qt::ControlModifier){
+            image_right_crop_down--;
+            image_right_crop_down = image_right_crop_down > 0 ? image_right_crop_down : 0;
+        }else{
+            image_right_crop_down++;
+        }
+        break;
+    case Qt::Key_K:
         if(e->modifiers() == Qt::ControlModifier){
             image_right_crop_right--;
             image_right_crop_right = image_right_crop_right > 0 ? image_right_crop_right : 0;
@@ -193,7 +261,7 @@ void player3D::keyPressEvent(QKeyEvent *e)
     case Qt::Key_Asterisk:
         swapFlag = !swapFlag;
         break;
-    case Qt::Key_BackForward:        
+    case Qt::Key_O:
         image_left_crop_up = 0;
         image_left_crop_down = 0;
         image_left_crop_left = 0;

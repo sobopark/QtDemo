@@ -24,12 +24,14 @@ public slots:
     void updateImage();
     void open_camera();
     void close_camera();
+    void record();
 
 private:
     Ui::player3D *ui;
 
     QTimer theTimer;
     bool swapFlag;
+    bool recordFlag;
 
     int image_left_crop_up;
     int image_left_crop_down;
@@ -39,6 +41,9 @@ private:
     int image_right_crop_down;
     int image_right_crop_left;
     int image_right_crop_right;
+    int record_image_count;
+
+    QString record_path;
 
 protected:
     void paintEvent(QPaintEvent *e);
