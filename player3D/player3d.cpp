@@ -26,6 +26,9 @@ player3D::player3D(QWidget *parent) :
 
     swapFlag = false;
     recordFlag = false;
+    image_left_mirror_flag = false;
+    image_right_mirror_flag = false;
+    image_mirror_flag = false;
 
     image_left_crop_up = 0;
     image_left_crop_down = 0;
@@ -52,38 +55,19 @@ player3D::~player3D()
 }
 
 void player3D::updateImage()
-{
-    if(cam->Gray_Flag == 0)
+{  
+    cam->videoCapL>>cam->srcImageL;
+    if(cam->srcImageL.data)
     {
-        cam->videoCapL>>cam->srcImageL;
-        if(cam->srcImageL.data)
-        {
-            cvtColor(cam->srcImageL, cam->srcImageL, CV_BGR2RGB);
+        cvtColor(cam->srcImageL, cam->srcImageL, CV_BGR2RGB);
 
-            cam->videoCapR>>cam->srcImageR;
-            if(cam->srcImageR.data)
-            {
-                cvtColor(cam->srcImageR, cam->srcImageR, CV_BGR2RGB);
-                this->update();
-            }
+        cam->videoCapR>>cam->srcImageR;
+        if(cam->srcImageR.data)
+        {
+            cvtColor(cam->srcImageR, cam->srcImageR, CV_BGR2RGB);
+            this->update();
         }
     }
-    else
-    {
-        cam->videoCapL>>cam->srcImageL;
-        if(cam->srcImageL.data)
-        {
-            cvtColor(cam->srcImageL, cam->srcImageL, CV_BGR2GRAY);
-
-            cam->videoCapR>>cam->srcImageR;
-            if(cam->srcImageR.data)
-            {
-                cvtColor(cam->srcImageR, cam->srcImageR, CV_BGR2GRAY);
-                this->update();
-            }
-        }
-    }
-
 }
 
 void player3D::paintEvent(QPaintEvent *e)
@@ -100,6 +84,14 @@ void player3D::paintEvent(QPaintEvent *e)
         imagel = QImage((uchar*)(cam->srcImageR.data), cam->srcImageR.cols, cam->srcImageR.rows, QImage::Format_RGB888);
     }
 
+    if(image_left_mirror_flag){
+        imagel = imagel.mirrored(true,false);
+    }
+
+    if(image_right_mirror_flag){
+        imager = imager.mirrored(true,false);
+    }
+
     QSize image1_size = imagel.size();
     QSize imager_size = imager.size();
     int result_size_width = image1_size.width() + imager_size.width();
@@ -109,12 +101,12 @@ void player3D::paintEvent(QPaintEvent *e)
                                image_left_crop_up,
                                image1_size.width() - image_left_crop_left - image_left_crop_right,
                                image1_size.height() - image_left_crop_up - image_left_crop_down));
-    imagel = imagel.scaled(QSize(image1_size.width(),image1_size.height()),Qt::IgnoreAspectRatio);
+    imagel = imagel.scaled(QSize(image1_size.width(),image1_size.height()),Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
     imager = imager.copy(QRect(image_right_crop_left,
                                image_right_crop_up,
                                imager_size.width() - image_right_crop_left - image_right_crop_right,
                                imager_size.height() - image_right_crop_up - image_right_crop_down));
-    imager = imager.scaled(QSize(imager_size.width(),imager_size.height()),Qt::IgnoreAspectRatio);
+    imager = imager.scaled(QSize(imager_size.width(),imager_size.height()),Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
 
     QImage image_result = QImage(result_size_width,result_size_height,QImage::Format_RGB888);
     QPainter painter(&image_result);
@@ -122,6 +114,9 @@ void player3D::paintEvent(QPaintEvent *e)
     painter.drawImage(image1_size.width(),0,imager);
     painter.end();
 
+    if(image_mirror_flag){
+        image_result = image_result.mirrored(true,false);
+    }
 
     if(recordFlag){
 
@@ -132,7 +127,7 @@ void player3D::paintEvent(QPaintEvent *e)
 
     }
 
-    QImage image_result_resize = image_result.scaled(QSize(ui->img_label->width(),ui->img_label->height()));
+    QImage image_result_resize = image_result.scaled(QSize(ui->img_label->width(),ui->img_label->height()),Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
     ui->img_label->setPixmap(QPixmap::fromImage(image_result_resize));
 //    ui->img_label->resize(image_result_resize.size());
     ui->img_label->show();
@@ -257,6 +252,15 @@ void player3D::keyPressEvent(QKeyEvent *e)
         }else{
             image_right_crop_right++;
         }
+        break;
+    case Qt::Key_X:
+        image_left_mirror_flag = !image_left_mirror_flag;
+        break;
+    case Qt::Key_M:
+        image_right_mirror_flag = !image_right_mirror_flag;
+        break;
+    case Qt::Key_B:
+        image_mirror_flag = !image_mirror_flag;
         break;
     case Qt::Key_Asterisk:
         swapFlag = !swapFlag;

@@ -32,6 +32,9 @@ private:
     QTimer theTimer;
     bool swapFlag;
     bool recordFlag;
+    bool image_left_mirror_flag;
+    bool image_right_mirror_flag;
+    bool image_mirror_flag;
 
     int image_left_crop_up;
     int image_left_crop_down;
