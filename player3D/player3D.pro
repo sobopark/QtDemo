@@ -17,7 +17,8 @@ TEMPLATE = app
 SOURCES += main.cpp\
         player3d.cpp \
         camera.cpp \
-    vlfeats.cpp
+    vlfeats.cpp \
+    opencvsift.cpp
 
 INCLUDEPATH += E:\work\Library\OpenCV\OpenCV2.4.11\opencv\build\include \
                E:\work\Library\OpenCV\OpenCV2.4.11\opencv\build\include\opencv \
@@ -35,6 +36,7 @@ LIBS += E:\work\Library\OpenCV\OpenCV2.4.11\opencv\build\x86\vc12\lib\opencv_hig
         E:\work\Library\OpenCV\OpenCV2.4.11\opencv\build\x86\vc12\lib\opencv_highgui2411d.lib\
         E:\work\Library\OpenCV\OpenCV2.4.11\opencv\build\x86\vc12\lib\opencv_legacy2411d.lib\
         E:\work\Library\OpenCV\OpenCV2.4.11\opencv\build\x86\vc12\lib\opencv_ml2411d.lib\
+        E:\work\Library\OpenCV\OpenCV2.4.11\opencv\build\x86\vc12\lib\opencv_nonfree2411d.lib\
         E:\work\Library\OpenCV\OpenCV2.4.11\opencv\build\x86\vc12\lib\opencv_objdetect2411d.lib\
         E:\work\Library\OpenCV\OpenCV2.4.11\opencv\build\x86\vc12\lib\opencv_ts2411d.lib\
         E:\work\Library\OpenCV\OpenCV2.4.11\opencv\build\x86\vc12\lib\opencv_video2411d.lib\
@@ -42,6 +44,7 @@ LIBS += E:\work\Library\OpenCV\OpenCV2.4.11\opencv\build\x86\vc12\lib\opencv_hig
 
 HEADERS  += player3d.h \
             camera.h \
-    vlfeats.h
+    vlfeats.h \
+    opencvsift.h
 
 FORMS    += player3d.ui
