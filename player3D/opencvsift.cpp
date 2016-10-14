@@ -8,20 +8,21 @@ opencvsift::opencvsift()
 
 }
 
-int opencvsift::siftDtc()
+vector<KeyPoint> opencvsift::siftDtc(Mat img)
 {
-    Mat img=imread("C:\\Users\\ZhongZY\\Desktop\\000182.bmp");
+    //Mat img=imread("C:\\Users\\ZhongZY\\Desktop\\000182.bmp");
+    vector<KeyPoint>  kp;
     SiftFeatureDetector  siftdtc;
-    vector<KeyPoint> kp;
     siftdtc.detect(img,kp);
-    Mat outimg;
-    drawKeypoints(img,kp,outimg);
-    imshow("image1 keypoints",outimg);
-    //KeyPoint kp_;
-    //vector<KeyPoint>::iterator itvc;
-    //for(itvc=kp.begin();itvc!=kp.end();itvc++)
-    //{
-    //    cout<<"angle:"<<itvc->angle<<"\t"<<itvc->class_id<<"\t"<<itvc->octave<<"\t"<<itvc->pt<<"\t"<<itvc->response<<endl;
-    //}
-    return 0;
+    //kp.clear();
+    //return descriptor1;
+    return kp;
+
+}
+Mat opencvsift::siftMat(Mat img,vector<KeyPoint> kp)
+{
+    SiftDescriptorExtractor extractor;
+    Mat descriptor;
+    extractor.compute(img,kp,descriptor);
+    return descriptor;
 }

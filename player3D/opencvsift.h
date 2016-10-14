@@ -12,7 +12,8 @@ class opencvsift
 {
 public:
     opencvsift();
-    int siftDtc();
+    vector<KeyPoint> opencvsift::siftDtc(Mat img);
+    Mat opencvsift::siftMat(Mat img,vector<KeyPoint> kp);
 };
 
 #endif // OPENCVSIFT_H

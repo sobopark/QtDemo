@@ -17,8 +17,10 @@ TEMPLATE = app
 SOURCES += main.cpp\
         player3d.cpp \
         camera.cpp \
-    vlfeats.cpp \
     opencvsift.cpp
+
+#QMAKE_CFLAGS_DEBUG += -MDd
+#QMAKE_CXXFLAGS_DEBUG += -MDd
 
 INCLUDEPATH += E:\work\Library\OpenCV\OpenCV2.4.11\opencv\build\include \
                E:\work\Library\OpenCV\OpenCV2.4.11\opencv\build\include\opencv \
@@ -40,7 +42,7 @@ LIBS += E:\work\Library\OpenCV\OpenCV2.4.11\opencv\build\x86\vc12\lib\opencv_hig
         E:\work\Library\OpenCV\OpenCV2.4.11\opencv\build\x86\vc12\lib\opencv_objdetect2411d.lib\
         E:\work\Library\OpenCV\OpenCV2.4.11\opencv\build\x86\vc12\lib\opencv_ts2411d.lib\
         E:\work\Library\OpenCV\OpenCV2.4.11\opencv\build\x86\vc12\lib\opencv_video2411d.lib\
-        E:\work\Library\vlfeat\vlfeat-0.9.20\bin\win32\vl.lib
+        #E:\work\Library\vlfeat\vlfeat-0.9.20\bin\win32\vl.lib
 
 HEADERS  += player3d.h \
             camera.h \
