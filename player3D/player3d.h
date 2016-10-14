@@ -16,6 +16,8 @@ class player3D : public QMainWindow
 
 public:
     explicit player3D(QWidget *parent = 0);
+    int autoGetpos();
+
     ~player3D();
 
     Camera *cam;
@@ -45,7 +47,8 @@ private:
     int image_right_crop_left;
     int image_right_crop_right;
     int record_image_count;
-
+    vector<KeyPoint> kp_left,kp_right;
+    vector<DMatch> result;
     QString record_path;
 
 protected:

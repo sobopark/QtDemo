@@ -1,6 +1,7 @@
 #include "player3d.h"
 #include "ui_player3d.h"
 #include "camera.h"
+#include "opencvsift.h"
 
 #include <QtWidgets>
 #include <QKeyEvent>
@@ -54,6 +55,29 @@ player3D::~player3D()
     delete ui;
 }
 
+int player3D::autoGetpos()
+{
+    opencvsift siftTool;
+    Mat img_left = cam->srcImageL;
+    Mat img_right= cam->srcImageR;
+    int eps=img_left.size().width;
+    int pos=0;
+    //static vector<KeyPoint> kp_left,kp_right;
+    //static vector<DMatch> result;
+    Mat des_left,des_right;
+    kp_left = siftTool.siftDtc(img_left);
+    kp_right= siftTool.siftDtc(img_right);
+    des_left = siftTool.siftMat(img_left,kp_left);
+    des_right= siftTool.siftMat(img_right,kp_right);
+    result=siftTool.siftMatch(des_left,des_right);
+    pos=siftTool.getXpox(result,kp_left,kp_right,eps);
+    kp_left.clear();
+    kp_right.clear();
+    result.clear();
+    return pos;
+    //return 0;
+}
+
 void player3D::updateImage()
 {  
     cam->videoCapL>>cam->srcImageL;
@@ -75,6 +99,7 @@ void player3D::paintEvent(QPaintEvent *e)
 
     QImage imagel;
     QImage imager;
+
 
     if(swapFlag){
         imagel = QImage((uchar*)(cam->srcImageL.data), cam->srcImageL.cols, cam->srcImageL.rows, QImage::Format_RGB888);
@@ -275,5 +300,10 @@ void player3D::keyPressEvent(QKeyEvent *e)
         image_right_crop_left = 0;
         image_right_crop_right = 0;
         break;
+    case Qt::Key_Z:
+        int tmp=autoGetpos();
+        image_left_crop_left=tmp;
+        image_right_crop_right=tmp;
+
     }
 }
