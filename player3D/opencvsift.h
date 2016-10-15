@@ -17,6 +17,8 @@ public:
     vector<DMatch> siftMatch(Mat img_left,Mat img_right);
     //static bool comparison(DMatch a,DMatch b);
     int getXpox(vector<DMatch> Matchs, vector<KeyPoint> kp_left, vector<KeyPoint> kp_right, int eps);
+
+
 };
 
 #endif // OPENCVSIFT_H

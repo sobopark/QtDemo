@@ -62,8 +62,10 @@ int player3D::autoGetpos()
     Mat img_right= cam->srcImageR;
     int eps=img_left.size().width;
     int pos=0;
-    //static vector<KeyPoint> kp_left,kp_right;
-    //static vector<DMatch> result;
+    vector<KeyPoint> kp_left,kp_right;
+    vector<DMatch> result;
+    vector<KeyPoint> del_1,del_2;
+    vector<DMatch> del_3;
     Mat des_left,des_right;
     kp_left = siftTool.siftDtc(img_left);
     kp_right= siftTool.siftDtc(img_right);
@@ -71,9 +73,9 @@ int player3D::autoGetpos()
     des_right= siftTool.siftMat(img_right,kp_right);
     result=siftTool.siftMatch(des_left,des_right);
     pos=siftTool.getXpox(result,kp_left,kp_right,eps);
-    kp_left.clear();
-    kp_right.clear();
-    result.clear();
+    kp_left.swap(del_1);
+    kp_right.swap(del_2);
+    result.swap(del_3);
     return pos;
     //return 0;
 }
